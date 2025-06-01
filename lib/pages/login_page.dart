@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           var abc = {
-                            "username": "Quynh Chi MB",
+                            "username": "Nhân viên MB",
                             "password": "85TranThaiTong"
                           };
                           _usernameController.text = abc["username"]!;

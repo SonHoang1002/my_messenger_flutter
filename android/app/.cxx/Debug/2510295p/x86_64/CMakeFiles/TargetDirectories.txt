@@ -1,0 +1,2 @@
+C:/Users/Admin/.vscode/App/LEARN_TECHNOLOGY/my_messenger_app_flu/android/app/.cxx/Debug/2510295p/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Admin/.vscode/App/LEARN_TECHNOLOGY/my_messenger_app_flu/android/app/.cxx/Debug/2510295p/x86_64/CMakeFiles/rebuild_cache.dir

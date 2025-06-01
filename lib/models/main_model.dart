@@ -68,7 +68,8 @@ class MessageEntity {
   final String type;
   final String? text;
   final String? mediaUrl;
-  final int timestamp;
+  final int createAt;
+  final int? updateAt;
   final List<String> seenBy;
   final List<ReactionEntity> reactions;
   final String? replyToMessageId;
@@ -81,16 +82,20 @@ class MessageEntity {
     required this.type,
     this.text,
     this.mediaUrl,
-    int? timestamp,
+    int? createAt,
+    int? updateAt,
     List<String>? seenBy,
     List<ReactionEntity>? reactions,
     this.replyToMessageId,
     List<String>? deletedForUsers,
   })  : id = id ?? 'message_${generateSuffix()}',
-        timestamp = timestamp ?? DateTime.now().millisecondsSinceEpoch,
+        createAt = createAt ?? DateTime.now().millisecondsSinceEpoch,
+        updateAt = updateAt,
         seenBy = seenBy ?? [],
         reactions = reactions ?? [],
         deletedForUsers = deletedForUsers ?? [];
+
+  bool isHideMessage(String userChatId) => deletedForUsers.contains(userChatId);
 
   factory MessageEntity.fromJson(Map<String, dynamic> json) {
     return MessageEntity(
@@ -100,7 +105,7 @@ class MessageEntity {
       type: json['type'],
       text: json['text'],
       mediaUrl: json['mediaUrl'],
-      timestamp: json['timestamp'],
+      createAt: json['createAt'],
       seenBy: List<String>.from(json['seenBy'] ?? []),
       reactions: (json['reactions'] as List<dynamic>?)
               ?.map((e) => ReactionEntity.fromJson(e))
@@ -119,7 +124,7 @@ class MessageEntity {
       'type': type,
       'text': text,
       'mediaUrl': mediaUrl,
-      'timestamp': timestamp,
+      'createAt': createAt,
       'seenBy': seenBy,
       'reactions': reactions.map((e) => e.toJson()).toList(),
       'replyToMessageId': replyToMessageId,
@@ -134,7 +139,8 @@ class MessageEntity {
     String? type,
     String? text,
     String? mediaUrl,
-    int? timestamp,
+    int? createAt,
+    int? updateAt,
     List<String>? seenBy,
     List<ReactionEntity>? reactions,
     String? replyToMessageId,
@@ -147,7 +153,8 @@ class MessageEntity {
       type: type ?? this.type,
       text: text ?? this.text,
       mediaUrl: mediaUrl ?? this.mediaUrl,
-      timestamp: timestamp ?? this.timestamp,
+      createAt: createAt ?? this.createAt,
+      updateAt: updateAt ?? this.updateAt,
       seenBy: seenBy ?? this.seenBy,
       reactions: reactions ?? this.reactions,
       replyToMessageId: replyToMessageId ?? this.replyToMessageId,
@@ -157,7 +164,7 @@ class MessageEntity {
 
   @override
   String toString() {
-    return 'MessageEntity(id: $id, roomId: $roomId, senderId: $senderId, type: $type, text: $text, mediaUrl: $mediaUrl, timestamp: $timestamp, seenBy: $seenBy, reactions: $reactions, replyToMessageId: $replyToMessageId, deletedForUsers: $deletedForUsers)';
+    return 'MessageEntity(id: $id, roomId: $roomId, senderId: $senderId, type: $type, text: $text, mediaUrl: $mediaUrl, createAt: $createAt, updateAt: $updateAt, seenBy: $seenBy, reactions: $reactions, replyToMessageId: $replyToMessageId, deletedForUsers: $deletedForUsers)';
   }
 
   // Factory method for creating a new message
@@ -176,7 +183,7 @@ class MessageEntity {
       type: type,
       text: text,
       mediaUrl: mediaUrl,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
+      createAt: DateTime.now().millisecondsSinceEpoch,
       seenBy: [],
       reactions: [],
       replyToMessageId: replyToMessageId,

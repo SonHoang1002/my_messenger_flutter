@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:my_messenger_app_flu/components/reaction_button.dart';
+import 'package:my_messenger_app_flu/config/constant.dart';
 import 'package:my_messenger_app_flu/models/main_model.dart';
 import 'package:my_messenger_app_flu/pages/chat_room_page.dart';
 import 'package:my_messenger_app_flu/services/auth_service.dart';
@@ -38,6 +39,10 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
+  void onChangeLastMessage(
+    MessageEntity newMessage,
+  ) {}
 
   Future<void> _refreshData() async {
     setState(() {
@@ -100,6 +105,7 @@ class _HomePageState extends State<HomePage> {
 
     return Column(
       children: [
+        // _buildTest(),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
@@ -141,18 +147,20 @@ class _HomePageState extends State<HomePage> {
         ),
         trailing: Text(
           room.lastMessage != null
-              ? _formatDateTime(room.lastMessage?.timestamp)
+              ? _formatDateTime(room.lastMessage?.createAt)
               : '',
           style: const TextStyle(fontSize: 12),
         ),
         onTap: () {
-          Clipboard.setData(ClipboardData(text: room.roomId));
+          // Clipboard.setData(ClipboardData(text: room.roomId));
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) {
                 return ChatRoomPage(
-                    roomId: room.roomId, userId: userChatData.userChatId);
+                  roomEntity: room,
+                  userChatEntity: userChatData,
+                );
               },
             ),
           );
@@ -169,5 +177,80 @@ class _HomePageState extends State<HomePage> {
     // } else {
     //   return "--";
     // }
+  }
+
+  Widget _buildTest() {
+    return Container(
+      width: 270,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _buildReactionButton(PATH_LIKE_GIF, ""),
+          _buildReactionButton(
+            PATH_LOVE_GIF,
+            "",
+            // size: const Size(45, 45),
+            // margin: EdgeInsets.only(bottom: 7),
+          ),
+          _buildReactionButton(
+            PATH_HAHA_GIF,
+            "",
+            // size: const Size(31, 31),
+            // margin: EdgeInsets.only(bottom: 1),
+          ),
+          _buildReactionButton(
+            PATH_WOW_GIF,
+            "",
+            // size: const Size(27.5, 27.5),
+            // margin: EdgeInsets.only(bottom: 2),
+          ),
+          _buildReactionButton(
+            PATH_YAY_GIF,
+            "",
+            // size: const Size(70, 70),
+            // margin: EdgeInsets.only(bottom: 10),
+          ),
+          _buildReactionButton(
+            PATH_SAD_GIF,
+            "",
+            // size: const Size(28.5, 28.5),
+            // margin: EdgeInsets.only(bottom: 4),
+          ),
+          _buildReactionButton(
+            PATH_ANGRY_GIF,
+            "",
+            // size: const Size(28.5, 28.5),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReactionButton(
+    String emojiGif,
+    String message, {
+    Size size = const Size(24, 24),
+    EdgeInsets margin = EdgeInsets.zero,
+  }) {
+    return ReactionButton(
+      emojiGif: emojiGif,
+      onSelect: () {},
+      size: size,
+      margin: margin,
+    );
   }
 }

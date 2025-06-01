@@ -1,0 +1,1 @@
+C:\Users\Admin\.vscode\App\LEARN_TECHNOLOGY\my_messenger_app_flu\build\app\intermediates\cxx\Debug\2510295p\obj\armeabi-v7a

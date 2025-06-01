@@ -27,17 +27,8 @@ class SocketChatRoom {
 
   Stream get stream => _channel.stream;
 
-  void sendMessage(MessageEntity message) {
+  void sendMessage(Map<String, dynamic> messageJson) {
     try {
-      final messageJson = {
-        'type': message.type,
-        'roomId': message.roomId,
-        'senderId': message.senderId,
-        'text': message.text,
-        'mediaUrl': message.mediaUrl,
-        'replyToMessageId': message.replyToMessageId,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-      };
       _channel.sink.add(json.encode(messageJson));
     } catch (e) {
       print('Error sending message: $e');
@@ -46,6 +37,6 @@ class SocketChatRoom {
   }
 
   void reconnect() {
-    disconnect(); 
+    disconnect();
   }
 }
