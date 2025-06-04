@@ -38,10 +38,15 @@
 //     );
 //   }
 // }
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:my_messenger_app_flu/config/constant.dart';
+import 'package:my_messenger_app_flu/draw_resize.dart';
 import 'package:my_messenger_app_flu/utils/extensions.dart';
+import 'package:my_messenger_app_flu/utils/helpers/size_helpers.dart';
 
 void main() => runApp(MyApp());
 
@@ -52,10 +57,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'List Item Example',
-      home: Scaffold(
-        appBar: AppBar(title: Text('List of Items')),
-        body: ItemListWidget(),
-      ),
+      home: DragResizeScreen(),
     );
   }
 }
@@ -69,7 +71,7 @@ class ItemListWidget extends StatefulWidget {
 
 class _ItemListWidgetState extends State<ItemListWidget>
     with TickerProviderStateMixin {
-  Size reactionBoxSize = Size(250, 45);
+  Size reactionBoxSize = Size(250 + 32, 45);
   Offset? _startOffset, _updateOffset;
   Offset? _startOffsetBegin;
 
@@ -84,10 +86,27 @@ class _ItemListWidgetState extends State<ItemListWidget>
 
   bool get isHaveHover => _hoveredReaction.value != null;
 
-  Offset get reactionOffset => _startOffsetBegin!.translate(
-        -reactionBoxSize.width / 2,
-        -reactionBoxSize.height - 20,
-      );
+  Offset get reactionOffset {
+    Size screenSize = SizeHelpers.getScreenSize(context);
+    Offset abc;
+    double dx = clampDouble(
+      _startOffsetBegin!.dx - reactionBoxSize.width / 2,
+      0,
+      screenSize.width - reactionBoxSize.width,
+    );
+
+    double dy = clampDouble(
+      _startOffsetBegin!.dy - reactionBoxSize.height - 20,
+      0,
+      screenSize.height - reactionBoxSize.height,
+    );
+    abc = Offset(dx, dy);
+    //   abc = _startOffsetBegin!.translate(
+    //   -reactionBoxSize.width / 2,
+    //   -reactionBoxSize.height / 2 - 20,
+    // );
+    return abc;
+  }
 
   Rect get rectLike {
     Offset a = reactionOffset;
@@ -98,75 +117,27 @@ class _ItemListWidgetState extends State<ItemListWidget>
   }
 
   Rect get rectHeart {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 2,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectLike.translate(reactionBoxSize.width / 6, 0);
   }
 
   Rect get rectHaha {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 2,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 3,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectHeart.translate(reactionBoxSize.width / 6, 0);
   }
 
   Rect get rectWow {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 3,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 4,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectHaha.translate(reactionBoxSize.width / 6, 0);
   }
 
   Rect get rectYay {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 4,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 5,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectWow.translate(reactionBoxSize.width / 6, 0);
   }
 
   Rect get rectSad {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 5,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 6,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectYay.translate(reactionBoxSize.width / 6, 0);
   }
 
   Rect get rectAngry {
-    Offset a = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 6,
-      0,
-    );
-    Offset b = reactionOffset.translate(
-      reactionBoxSize.width / 6 * 7,
-      reactionBoxSize.height + 20,
-    );
-    return Rect.fromPoints(a, b);
+    return rectSad.translate(reactionBoxSize.width / 6, 0);
   }
 
   void _removeReactionOverlay() {
@@ -220,6 +191,8 @@ class _ItemListWidgetState extends State<ItemListWidget>
                           onPanUpdate: _onPanUpdateReactBox,
                           onPanEnd: _onPanEndReactBox,
                           child: Container(
+                            width: reactionBoxSize.width,
+                            height: reactionBoxSize.height,
                             padding: EdgeInsets.all(8),
                             transform: Matrix4.identity()
                               ..scale(
@@ -410,48 +383,73 @@ class _ItemListWidgetState extends State<ItemListWidget>
   @override
   Widget build(BuildContext context) {
     print("_hoveredReaction.value = ${_hoveredReaction.value}");
-    return Stack(
-      children: [
-        ListView.builder(
-          itemCount: 100,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onLongPressDown: _onLongPressDown,
-              onLongPressStart: _onLongPressStart,
-              onLongPressMoveUpdate: _onLongPressMoveUpdate,
-              onLongPressEnd: _onLongPressEnd,
-              child: Container(
-                height: 50,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                child: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Reaction $index", style: TextStyle(fontSize: 12)),
-                    Divider(thickness: 2),
-                    Text("Comment $index", style: TextStyle(fontSize: 12)),
-                    Divider(thickness: 2),
-                    Text("Share $index", style: TextStyle(fontSize: 12))
-                  ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          ListView.builder(
+            itemCount: 100,
+            itemBuilder: (context, index) {
+              return RawGestureDetector(
+                gestures: <Type, GestureRecognizerFactory>{
+                  LongPressGestureRecognizer:
+                      GestureRecognizerFactoryWithHandlers<
+                          LongPressGestureRecognizer>(
+                    () => LongPressGestureRecognizer(
+                      duration: Duration(milliseconds: 1000),
+                    ),
+                    (LongPressGestureRecognizer instance) {
+                      instance
+                        ..onLongPressDown = _onLongPressDown
+                        ..onLongPressStart = _onLongPressStart
+                        ..onLongPressMoveUpdate = _onLongPressMoveUpdate
+                        ..onLongPressEnd = _onLongPressEnd;
+                    },
+                  ),
+                  PanGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+                      PanGestureRecognizer>(
+                    () => PanGestureRecognizer(),
+                    (PanGestureRecognizer instance) {
+                      instance
+                        ..onStart = (_) {} // Không làm gì khi bắt đầu kéo
+                        ..onUpdate = (_) {} // Không làm gì khi cập nhật kéo
+                        ..onEnd = (_) {}; // Không làm gì khi kết thúc kéo
+                    },
+                  ),
+                },
+                // behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 12.0),
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Reaction $index", style: TextStyle(fontSize: 12)),
+                      Divider(thickness: 2),
+                      Text("Comment $index", style: TextStyle(fontSize: 12)),
+                      Divider(thickness: 2),
+                      Text("Share $index", style: TextStyle(fontSize: 12))
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          if (isShowingReactionBox)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  _removeReactionOverlay();
+                  setState(() {});
+                },
+                child: Container(
+                  color: Colors.red.withValues(alpha: 0.4),
                 ),
               ),
-            );
-          },
-        ),
-        if (isShowingReactionBox)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () {
-                _removeReactionOverlay();
-                setState(() {});
-              },
-              child: Container(
-                color: Colors.red.withValues(alpha: 0.4),
-              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
